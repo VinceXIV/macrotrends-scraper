@@ -7,9 +7,6 @@ import re
 import json
 import pandas as pd
 import requests
-import os
-os.chdir('k:/')
-
 
 #simply scrape
 def scrape(url,**kwargs):
