@@ -55,9 +55,11 @@ def get_score(ticker, method=np.sum):
     return score
     
 def clean_scores(scores):
+    print(scores)
     # Because most scores don't have a value in 2023 yet
-    scores = scores[scores['year'] < 2023]
-    
+    scores = scores[scores.index < 2023]
+
+
     return scores.dropna(axis=1)
 
 def get_scores_df(ticker_list, method=np.sum, limit=np.inf):
