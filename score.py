@@ -55,7 +55,6 @@ def get_score(ticker, method=np.sum):
     return score
     
 def clean_scores(scores):
-    print(scores)
     # Because most scores don't have a value in 2023 yet
     scores = scores[scores.index < 2023]
 

@@ -5,7 +5,7 @@ import yfinance as yf
 def get_yearly_return(ticker_list, start_year):
     result = {}
     for ticker in ticker_list:
-        data = yf.download(ticker, progress=False).reset_index()
+        data = yf.download(ticker, progress=False, show_errors=False).reset_index()
         data = data[data['Date'].dt.year >= start_year]
         data['year'] = data['Date'].dt.year
 
@@ -30,7 +30,7 @@ def get_yearly_return(ticker_list, start_year):
 def get_monthly_return(ticker_list, start_year):
     result = {}
     for ticker in ticker_list:
-        data = yf.download(ticker, progress=False).reset_index()
+        data = yf.download(ticker, progress=False, show_errors=False).reset_index()
         data = data[data['Date'].dt.year >= start_year]
         data['year'] = data['Date'].dt.year
         data['month'] = data['Date'].dt.month
@@ -65,7 +65,7 @@ def get_monthly_adjusted_price(ticker_list, start_year):
 
     for ticker in ticker_list:
         try:
-            data = yf.download(ticker, progress=False).reset_index()
+            data = yf.download(ticker, progress=False, show_errors=False).reset_index()
             data = data[data['Date'].dt.year >= start_year]
             data['year'] = data['Date'].dt.year
             data['month'] = data['Date'].dt.month
