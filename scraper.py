@@ -39,7 +39,7 @@ def etl(response):
     return df
 
 
-def get_financial_info(ticker):
+def scrape_financial_info(ticker):
     
     url='https://www.macrotrends.net/stocks/charts/{t}/apple/financial-statements'.format(t=ticker)
     response=scrape(url)
