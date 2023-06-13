@@ -55,3 +55,37 @@ def get_monthly_return(ticker_list, start_year):
                 continue   
 
     return pd.DataFrame(result)
+
+
+# Returns price (Adj Close) relative to the first price
+# Where the first price is set to 1
+def get_monthly_adjusted_price(ticker_list, start_year):
+    result = {}
+    for ticker in ticker_list:
+        data = yf.download(ticker, progress=False).reset_index()
+        data = data[data['Date'].dt.year >= start_year]
+        data['year'] = data['Date'].dt.year
+        data['month'] = data['Date'].dt.month
+
+        start_year_data = data[data['Date'] == data['Date'].min()]
+        start_year_price = start_year_data['Adj Close']
+
+        result[ticker] = {}
+        for year in data['year'].unique():
+            try:
+                yearly_data = data[data['year'] == year]
+
+                for month in data['month'].unique():
+                    monthly_data = yearly_data[yearly_data['month'] == month]
+
+                    end_date = monthly_data['Date'].max()
+
+                    end_adj_close = float(data[data['Date'] == end_date]['Adj Close'])
+
+                    adj_price = (end_adj_close - start_year_price)/start_year_price
+
+                    result[ticker]["{y}-{m}".format(y=year, m=month)] = adj_price
+            except:
+                continue   
+
+    return pd.DataFrame(result)
