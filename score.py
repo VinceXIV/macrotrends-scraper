@@ -38,7 +38,7 @@ def get_score(ticker, method=np.sum):
     ratios = normalize(get_ratios(ticker))
     score = ratios.apply(lambda row: method(row), axis=1)
 
-    # Pick only the year for index
+    # Pick only the year (as integer) for index
     score = score.reset_index()
     score['year'] = score['index'].apply(lambda x: int(x.split("-")[0]))
     score = score.set_index('year')
@@ -53,3 +53,16 @@ def get_score(ticker, method=np.sum):
 
     return score
     
+
+def get_scores_df(ticker_list, method=np.sum, limit=np.inf):
+    scores = []
+    for ticker, i in zip(ticker_list, range(len(ticker_list))):
+        try:
+            scores.append(get_score(ticker, method=method))
+        except:
+            continue
+
+        if(i >= limit):
+            break
+
+    return pd.concat(scores, axis=1)
