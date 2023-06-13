@@ -67,8 +67,7 @@ def get_monthly_adjusted_price(ticker_list, start_year):
         data['year'] = data['Date'].dt.year
         data['month'] = data['Date'].dt.month
 
-        start_year_data = data[data['Date'] == data['Date'].min()]
-        start_year_price = start_year_data['Adj Close']
+        start_month_price = None
 
         result[ticker] = {}
         for year in data['year'].unique():
@@ -77,12 +76,13 @@ def get_monthly_adjusted_price(ticker_list, start_year):
 
                 for month in data['month'].unique():
                     monthly_data = yearly_data[yearly_data['month'] == month]
-
                     end_date = monthly_data['Date'].max()
-
                     end_adj_close = float(data[data['Date'] == end_date]['Adj Close'])
 
-                    adj_price = (end_adj_close - start_year_price)/start_year_price
+                    if start_month_price == None:
+                        start_month_price = end_adj_close
+
+                    adj_price = end_adj_close/start_month_price
 
                     result[ticker]["{y}-{m}".format(y=year, m=month)] = adj_price
             except:
