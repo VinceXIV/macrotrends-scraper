@@ -51,6 +51,7 @@ def get_score(ticker, method=np.sum):
     first_year_raw_score = score.sort_index(ascending=True).iloc[0]
     score[ticker] = score[ticker].apply(lambda x: x/first_year_raw_score)
 
+    score = score.sort_index(ascending=True)
     return score
     
 
