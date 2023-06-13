@@ -1,6 +1,7 @@
 import pandas as pd
 import yfinance as yf
 
+
 def get_yearly_return(ticker_list, start_year):
     result = {}
     for ticker in ticker_list:
@@ -89,4 +90,10 @@ def get_monthly_adjusted_price(ticker_list, start_year):
         except:
             continue
 
-    return pd.DataFrame(result)
+    result = pd.DataFrame(result).reset_index()
+    result['year'] = result['index'].apply(lambda x: x.split("-")[0]).astype(int)
+    result['month'] = result['index'].apply(lambda x: x.split("-")[1]).astype(int)
+    result = result.drop('index', axis=1)
+    result = result.set_index(["year", "month"])
+
+    return result
