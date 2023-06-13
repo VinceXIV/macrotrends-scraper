@@ -7,7 +7,6 @@ def get_pair_distance(df, start_year_month=None, end_year_month=None):
         df = df[df.index < end_year_month]
 
     df_corr = df.dropna(axis=1).corr()
-    print(df_corr)
 
     pairs = {}
     for col in df_corr:
