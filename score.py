@@ -40,8 +40,16 @@ def normalize(df):
     return pd.DataFrame(result)
 
 # Calculate the score
-def get_score(ticker, method=np.sum):
+def get_score(ticker, method=np.sum, use=None):
     ratios = normalize(get_ratios(ticker))
+
+    # Person may only need to one column (e.g ebtda-margin)
+    # in that case, they will pass an array of what they want
+    # if they are not specific about what they want. We 
+    # give them everything
+    if(not use):
+        ratios = ratios[use]
+
     score = ratios.apply(lambda row: method(row), axis=1)
 
     # Pick only the year (as integer) for index
@@ -67,11 +75,11 @@ def clean_scores(scores):
 
     return scores.dropna(axis=1)
 
-def get_scores_df(ticker_list, method=np.sum, limit=np.inf):
+def get_scores_df(ticker_list, method=np.sum, limit=np.inf, use=None):
     scores = []
     for ticker, i in zip(ticker_list, range(len(ticker_list))):
         try:
-            scores.append(get_score(ticker, method=method))
+            scores.append(get_score(ticker, method=method, use=use))
         except:
             continue
 
