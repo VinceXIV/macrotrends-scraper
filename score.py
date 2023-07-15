@@ -3,13 +3,19 @@ from scraper import scrape_financial_info
 import pandas as pd
 import numpy as np
 
-# Get some of the important financial ratios
+def get_ratio(row, col_1, col_2):
+    try:
+        return float(row[col_1]) / float(row[col_2])
+    except:
+        return np.nan
+
 def get_ratios(ticker):
     financial_info = scrape_financial_info(ticker)
 
-    financial_info['ebtda-margin'] = financial_info['ebitda'].astype(float) / financial_info['revenue'].astype(float)
-    financial_info['gross-profit-margin'] = financial_info['gross-profit'].astype(float) / financial_info['revenue'].astype(float)
-    financial_info['cogs-margin'] = financial_info['cost-goods-sold'].astype(float) / financial_info['revenue'].astype(float)
+    financial_info['ebtda-margin'] = financial_info.apply(lambda row: get_ratio(row, 'ebtda', 'revenue'), axis=1)
+
+    financial_info['gross-profit-margin'] = financial_info.apply(lambda row: get_ratio(row, 'gross-profit', 'revenue'), axis=1)
+    financial_info['cogs-margin'] = financial_info.apply(lambda row: get_ratio(row, 'cost-goods-sold', 'revenue'), axis=1)
     # financial_info['eps-basic-net-earnings-per-share'] = financial_info['eps-basic-net-earnings-per-share'].astype(float)
     financial_info['eps-earnings-per-share-diluted'] = financial_info['eps-earnings-per-share-diluted'].astype(float)
 
