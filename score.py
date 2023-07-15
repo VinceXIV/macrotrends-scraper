@@ -2,6 +2,7 @@ from stocksymbol import StockSymbol
 from scraper import scrape_financial_info
 import pandas as pd
 import numpy as np
+import copy
 
 def get_ratio(row, col_1, col_2):
     try:
@@ -40,7 +41,7 @@ def normalize(df):
     return pd.DataFrame(result)
 
 # Calculate the score
-def get_score(ticker, method=np.sum, use=None):
+def get_score(ticker, method=np.sum, use = None):
     ratios = normalize(get_ratios(ticker))
 
     # Person may only need to one column (e.g ebtda-margin)
@@ -48,42 +49,64 @@ def get_score(ticker, method=np.sum, use=None):
     # if they are not specific about what they want. We 
     # give them everything
     if(not use):
-        ratios = ratios[use]
+        use = ['ebtda-margin', 'gross-profit-margin','cogs-margin', 'eps-earnings-per-share-diluted']
 
-    score = ratios.apply(lambda row: method(row), axis=1)
+    # Create a list of items for which we would like to calculate the spread
+    # of the assets using the sum of squared distance method
+    # In the first round, it would simply be the variables, e.g 'ebtda-margin',
+    # 'gross-profit-margin', etc. Then everything combined
+    fundamentals = {}
+    for col in use:
+        fundamentals[col] = [col]
+    fundamentals['all-fundamental-variables'] = copy.deepcopy(use)
 
-    # Pick only the year (as integer) for index
-    score = score.reset_index()
-    score['year'] = score['index'].apply(lambda x: int(x.split("-")[0]))
-    score = score.set_index('year')
+    scores = {}
+    for val in fundamentals:
+        score = ratios[fundamentals[val]].apply(lambda row: method(row), axis=1)
 
-    # Convert score to dataframe and use ticker name as column name
-    score = pd.DataFrame(score)[[0]]
-    score.rename(columns={0: ticker}, inplace=True)
+        # Pick only the year (as integer) for index
+        score = score.reset_index()
+        score['year'] = score['index'].apply(lambda x: int(x.split("-")[0]))
+        score = score.set_index('year')
 
-    # Adjust score such that the first value = 1
-    first_year_raw_score = score.sort_index(ascending=True).iloc[0]
-    score[ticker] = score[ticker].apply(lambda x: x/first_year_raw_score)
+        # Convert score to dataframe and use ticker name as column name
+        score = pd.DataFrame(score)[[0]]
+        score.rename(columns={0: ticker}, inplace=True)
 
-    score = score.sort_index(ascending=True)
-    return score
+        # Adjust score such that the first value = 1
+        first_year_raw_score = score.sort_index(ascending=True).iloc[0]
+        score[ticker] = score[ticker].apply(lambda x: x/first_year_raw_score)
+
+        scores[val] = score.sort_index(ascending=True)
+
+    return scores
     
 def clean_scores(scores):
     # Because most scores don't have a value in 2023 yet
     scores = scores[scores.index < 2023]
 
-
-    return scores.dropna(axis=1)
+    return scores
 
 def get_scores_df(ticker_list, method=np.sum, limit=np.inf, use=None):
-    scores = []
+    scores = {}
     for ticker, i in zip(ticker_list, range(len(ticker_list))):
         try:
-            scores.append(get_score(ticker, method=method, use=use))
+            score_val = get_score(ticker, method=method, use=use)
+            for key in score_val:
+                if key in scores:
+                    scores[key].append(score_val[key])
+                else:
+                    scores[key] = []
+                    scores[key].append(score_val[key])
         except:
             continue
 
         if(i >= limit):
             break
 
-    return clean_scores(pd.concat(scores, axis=1))
+    print("scores: ", scores)
+    result = {}
+    for key in scores:
+        result[key] = clean_scores(pd.concat(scores[key], axis=1))
+
+    return result
