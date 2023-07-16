@@ -11,7 +11,12 @@ def get_pair_distance(df, start_year_month=None, end_year_month=None):
     pairs = {}
     for col in df_corr:
         for row in df_corr.index:
-            if(row != col and (col, row) not in pairs):
-                pairs[(row, col)] = df_corr[row][col]
+
+            key = tuple(sorted([col, row]))
+
+            # If we already have a pair (a, b), we don't want another
+            # pair (b, a). We also don't want a pair of an asset and itself
+            if(row != col and key not in pairs):
+                pairs[key] = df_corr[row][col]
 
     return pd.Series(pairs).sort_values(ascending=False)
