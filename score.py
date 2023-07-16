@@ -33,10 +33,9 @@ def get_ratios(ticker):
 # Make the values in a df to range between 0 and 1
 def normalize(df):
     result = {}
-    for col in df.columns:
-        min_val = df[col].min()
-        max_val = df[col].max()
-        result[col] = df[col].apply(lambda x: (x - min_val)/(max_val - min_val))
+    for col, i in zip(df.columns, range(len(df.columns))):
+        first_val = df.iloc[0, i]
+        result[col] = df[col].apply(lambda x: x/first_val)
 
     return pd.DataFrame(result)
 
@@ -77,7 +76,8 @@ def get_score(ticker, method=np.sum, use = None):
         score = pd.DataFrame(score)[[0]]
         score.rename(columns={0: ticker}, inplace=True)
 
-        # Adjust score such that the first value = 1
+        # Normalize the score such that the first value = 1 and all the
+        # rest are relative to it
         first_year_raw_score = score.sort_index(ascending=True).iloc[0]
         score[ticker] = score[ticker].apply(lambda x: x/first_year_raw_score)
 
