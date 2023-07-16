@@ -69,6 +69,10 @@ def get_score(ticker, method=np.sum, use = None):
         score['year'] = score['index'].apply(lambda x: int(x.split("-")[0]))
         score = score.set_index('year')
 
+        # Drop duplicated indices
+        # Read more about it here; https://stackoverflow.com/questions/13035764/remove-pandas-rows-with-duplicate-indices
+        score = score[~score.index.duplicated(keep='first')]
+
         # Convert score to dataframe and use ticker name as column name
         score = pd.DataFrame(score)[[0]]
         score.rename(columns={0: ticker}, inplace=True)
