@@ -12,7 +12,7 @@ def get_pair_distance(df, start_year_month=None, end_year_month=None):
     for col in df_corr:
         for row in df_corr.index:
 
-            key = tuple(sorted([col, row]))
+            key = '_'.join([val for val in sorted([col, row])])
 
             # If we already have a pair (a, b), we don't want another
             # pair (b, a). We also don't want a pair of an asset and itself
