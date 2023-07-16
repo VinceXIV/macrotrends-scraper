@@ -101,10 +101,16 @@ def get_monthly_adjusted_price(ticker_list, start_year):
 
 def get_yearly_normalized_price(ticker_list, start_year):
     result = {}
+    
     for ticker in ticker_list:
-        data = yf.download(ticker, progress=False, show_errors=False).reset_index()
-        data = data[data['Date'].dt.year >= start_year]
-        data['year'] = data['Date'].dt.year
+        data = None
+        
+        try:
+            data = yf.download(ticker, progress=False, show_errors=False).reset_index()
+            data = data[data['Date'].dt.year >= start_year]
+            data['year'] = data['Date'].dt.year
+        except:
+            continue
 
         result[ticker] = {}
         max_price = data['Adj Close'].max()
