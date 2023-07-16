@@ -36,7 +36,9 @@ def normalize(df):
     for col in df.columns:
         min_val = df[col].min()
         max_val = df[col].max()
-        result[col] = df[col].apply(lambda x: (x - min_val)/(max_val - min_val))
+
+        # Normalize the values using x/(max({x1, x2 ... xn}) - min({x1, x2 ... xn})) formula
+        result[col] = df[col].apply(lambda x: x/(max_val - min_val))
 
     return pd.DataFrame(result)
 
