@@ -110,7 +110,6 @@ def get_scores_df(ticker_list, method=np.sum, limit=np.inf, use=None):
         if(i >= limit):
             break
 
-    print("scores: ", scores)
     result = {}
     for key in scores:
         result[key] = clean_scores(pd.concat(scores[key], axis=1))
