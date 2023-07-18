@@ -14,28 +14,28 @@ def get_pair_distance(df, start_year_month=None, end_year_month=None):
 
     df = df.dropna(axis=1)
 
-    df_ssd = {}
+    # df_corr = {}
 
-    # calculate the sum of squared difference for each column
-    for stock_1 in df:
-        df_ssd[stock_1] = {}
-        for stock_2 in df:
-            if stock_1 != stock_2:
-                ssd = ((df[stock_1] - df[stock_2])**2).sum()
-                df_ssd[stock_1][stock_2] = ssd
+    # # calculate the sum of squared difference for each column
+    # for stock_1 in df:
+    #     df_corr[stock_1] = {}
+    #     for stock_2 in df:
+    #         if stock_1 != stock_2:
+    #             ssd = ((df[stock_1] - df[stock_2])**2).sum()
+    #             df_corr[stock_1][stock_2] = ssd
 
-    df_ssd = pd.DataFrame(df_ssd)
+    df_corr = df.corr()
 
     pairs = {}
-    for col in df_ssd:
-        for row in df_ssd.index:
+    for col in df_corr:
+        for row in df_corr.index:
 
             key = '_'.join([val for val in sorted([col, row])])
 
             # If we already have a pair (a, b), we don't want another
             # pair (b, a). We also don't want a pair of an asset and itself
             if(row != col and key not in pairs):
-                pairs[key] = df_ssd[row][col]
+                pairs[key] = df_corr[row][col]
 
     return pd.Series(pairs).sort_values(ascending=False)
 
