@@ -1,5 +1,5 @@
 # Macrotrends Scraper
 
-A web scraper for getting financial data from [macrotrends](macrotrends.com) + lots of analyses
+Scraping [macrotrends](macrotrends.com) and doing some analyses on the data
 
 <!-- Shoutout [je-suis-tm](https://github.com/je-suis-tm/web-scraping/blob/master/Macrotrends.py) -->
